@@ -1,0 +1,50 @@
+<annotation>
+	<folder>Gray_Leaf_Spot</folder>
+	<filename>Corn_Gray_Spot (3).jpg</filename>
+	<path>/home/olivier/Desktop/ML/Maize_Dataset/images/Gray_Leaf_Spot/Corn_Gray_Spot (3).jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>298</width>
+		<height>372</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>leaf</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>25</xmin>
+			<ymin>2</ymin>
+			<xmax>292</xmax>
+			<ymax>365</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>gray</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>34</xmin>
+			<ymin>141</ymin>
+			<xmax>99</xmax>
+			<ymax>285</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>gray</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>174</xmin>
+			<ymin>65</ymin>
+			<xmax>237</xmax>
+			<ymax>233</ymax>
+		</bndbox>
+	</object>
+</annotation>

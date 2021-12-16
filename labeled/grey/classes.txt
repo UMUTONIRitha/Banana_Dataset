@@ -13,6 +13,5 @@ ribs
 pulled pork
 hamburger
 cavity
-bright
-rust
+leaf
 gray
