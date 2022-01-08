@@ -1,4 +1,4 @@
-from generator import generate
+from Maize_Dataset.generator import generate
 import glob
 import cv2
 import random
@@ -73,11 +73,11 @@ class compile:
         pass
     @classmethod
     def generator(self, data_x, data_y):
-        for index, img in enumerate(self.data_x):
+        for index, img in enumerate(data_x):
             for generic_img in generate.batch_1(img):
-                position = random.randint(0, len(self.data_x)) 
+                position = random.randint(0, len(data_x)) 
                 data_x.insert(position,generic_img)
-                data_y.insert(position, self.data_y[index]) 
+                data_y.insert(position, data_y[index]) 
         return data_x, data_y
     @property
     def load(self, train_size=.7, test_size=.3):
