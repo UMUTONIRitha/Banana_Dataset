@@ -1,8 +1,9 @@
 from Maize_Dataset.generator import generate
-import glob
 import cv2
 import random
 import os
+import numpy as np
+
 
 class compile:
     path = r'Maize_Dataset/src/'
@@ -83,7 +84,7 @@ class compile:
     def load(self, train_size=.7, test_size=.3):
         if (train_size + test_size) == 1:
             train_slice = int(len(self.data_x)/.7)
-            return self.data_x[:train_slice], self.data_y[:train_slice] , self.data_x[train_slice:], self.data_x[train_slice:]
+            return np.array(self.data_x[:train_slice]), np.array(self.data_y[:train_slice]), np.array(self.data_x[train_slice:]), np.array(self.data_x[train_slice:])
         elif (train_size + test_size) != 1:
             return ValueError('Invalid Split Value') 
         
