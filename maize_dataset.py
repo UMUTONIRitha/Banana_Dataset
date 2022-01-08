@@ -82,8 +82,8 @@ class compile:
     @property
     def load(self, train_size=.7, test_size=.3):
         if (train_size + test_size) == 1:
-            train_slice = int(len(self.x_dataset)/.7)
-            return self.x_dataset[:train_slice], self.y_dataset[:train_slice] , self.x_dataset[train_slice:], self.y_dataset[train_slice:]
+            train_slice = int(len(self.data_x)/.7)
+            return self.data_x[:train_slice], self.data_y[:train_slice] , self.data_x[train_slice:], self.data_x[train_slice:]
         elif (train_size + test_size) != 1:
             return ValueError('Invalid Split Value') 
         
