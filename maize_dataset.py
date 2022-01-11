@@ -4,10 +4,8 @@ import random
 import os
 import numpy as np
 
-
-
 class compile:
-    path = r'src/'
+    path = r'Maize_Dataset/src/'
     def __init__(self, classes='binary', resize_shape=(256, 256), normalise=True, load_equal_ratio=True, augmentation_stage=1):
         self.fetch_imgs_paths()
         if classes == 'binary':
