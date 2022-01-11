@@ -5,8 +5,9 @@ import os
 import numpy as np
 
 
+
 class compile:
-    path = r'Maize_Dataset/src/'
+    path = r'src/'
     def __init__(self, classes='binary', resize_shape=(256, 256), normalise=True, load_equal_ratio=True, augmentation_stage=1):
         self.fetch_imgs_paths()
         if classes == 'binary':
@@ -16,8 +17,6 @@ class compile:
         else :
             return ValueError('Invalid class specification')
         
-        if augmentation_stage > 0:
-            self.data_x, self.data_y = self.generator(self.data_x, self.data_y)
             
        
     @classmethod
@@ -37,17 +36,25 @@ class compile:
                     for img_path in self.imgs_paths[class_folder]:
                         position = random.randint(0, len(x_dataset))
                         img_array = cv2.resize(cv2.imread(self.path + class_folder + '/' + img_path), resize_shape, interpolation = cv2.INTER_AREA)
-                        img_array = img_array / 256 if normalise == True else img_array
-                        x_dataset.insert(position, img_array)
+                        x_dataset.insert(position, img_array / 256.0 if normalise == True else img_array)
                         y_dataset.insert(position, 0)
+                        for img in generate.batch_1(img_array):
+                            new_pos = random.randint(0, len(x_dataset))
+                            x_dataset.insert(new_pos, img / 256.0 if normalise == True else img_array)
+                            y_dataset.insert(new_pos, 0)
+                            
+                        
                 else:
                     sample_pool = random.sample(self.imgs_paths[class_folder], class_sample_size)
                     for img in sample_pool:
                         position = random.randint(0, len(x_dataset))
                         img_array = cv2.resize(cv2.imread(self.path + class_folder + '/' + img), resize_shape, interpolation=cv2.INTER_AREA)
-                        img_array = img_array / 256 if normalise == True else img_array
-                        x_dataset.insert(position, img_array)
+                        x_dataset.insert(position, img_array / 256.0 if normalise == True else img_array)
                         y_dataset.insert(position, 1)
+                        for img in generate.batch_1(img_array):
+                            new_pos = random.randint(0, len(x_dataset))
+                            x_dataset.insert(new_pos, img / 256.0 if normalise == True else img_array)
+                            y_dataset.insert(new_pos, 1)
                         
                         
         elif fetch_max_equal_ratio == False:
@@ -74,19 +81,18 @@ class compile:
         pass
     @classmethod
     def generator(self, data_x, data_y):
-        for index, img in enumerate(data_x):
+        for index, img in enumerate(self.data_x):
             for generic_img in generate.batch_1(img):
-                position = random.randint(0, len(data_x)) 
+                position = random.randint(0, len(self.data_x)) 
                 data_x.insert(position,generic_img)
-                data_y.insert(position, data_y[index]) 
+                data_y.insert(position, self.data_y[index]) 
         return data_x, data_y
     @property
     def load(self, train_size=.7, test_size=.3):
         if (train_size + test_size) == 1:
-            train_slice = int(len(self.data_x)/.7)
-            return np.asarray(self.data_x[:train_slice]), np.asarray(self.data_y[:train_slice]), np.asarray(self.data_x[train_slice:]), np.asarray(self.data_x[train_slice:])
+            train_slice = int(len(self.x_dataset)/.7)
+            return self.x_dataset[:train_slice], self.y_dataset[:train_slice] , self.x_dataset[train_slice:], self.y_dataset[train_slice:]
         elif (train_size + test_size) != 1:
             return ValueError('Invalid Split Value') 
         
-    
-    
+  
