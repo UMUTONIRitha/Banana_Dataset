@@ -49,7 +49,6 @@ def save_generation(img_files, split, folder_path, class_folder, names, augment=
                     cv2.imwrite(folder_path + split + class_folder + '/' + str(names.pop()) + '.jpg', generic_img)
         del img_file
 
-
 def to_split_folder(folder_path, img_path_dict, ratio, augment):
     folder_splits = ('train/', 'val/', 'test/')
     try:
@@ -79,11 +78,10 @@ def to_split_folder(folder_path, img_path_dict, ratio, augment):
                 save_generation(img_files=img_files, split='val/', folder_path=folder_path, class_folder=class_folder, names=names)
         if ratio.index(split) == 2:
             for class_folder, img_files in img_path_dict.items():
-                img_files = img_files[(int(len(img_files)*ratio[0])+(int(len(img_files)*ratio[1])+int(len(img_files)*split))):]
+                img_files = img_files[(int(len(img_files)*ratio[0])+(int(len(img_files)*ratio[1]))):]
                 names = [id for id in range((len(img_files)) * 7)]
                 random.shuffle(names)
                 save_generation(img_files=img_files, split='test/', folder_path=folder_path, class_folder=class_folder, names=names)
-
   
 class compile:
     path = 'Maize_Dataset/src/'
