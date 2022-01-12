@@ -18,10 +18,37 @@ class compile:
             
        
     @classmethod
-    def fetch_imgs_paths(self):
-        self.imgs_paths = {}
-        for class_folder in os.listdir(f'{self.path}'):
-            self.imgs_paths[f'{class_folder}'] = os.listdir(f'{self.path}{class_folder}/')
+    def fetch_imgs_path(path, class_encoding, equal_ratio_to_healthy, shuffle):
+    class_folders = os.listdir(path)
+    imgs_path_dict = {}
+    for class_folder in class_folders:
+        files = [path + class_folder + '/' + file for file in os.listdir(path + class_folder + '/')]
+        if shuffle == True:
+            random.shuffle(files)
+        imgs_path_dict[str(class_folder)] = files
+    if class_encoding == 'binary':
+        temp_dict = {'unhealthy':[], 'healthy':[]}
+        if equal_ratio_to_healthy == True:
+            ratio = int(len(imgs_path_dict['healthy']) / (len(class_folders) - 1))
+            for folder, img_files  in imgs_path_dict.items():
+                if folder == 'healthy':
+                    temp_dict['healthy'] = random.sample(imgs_path_dict[folder], len(imgs_path_dict['healthy']))
+                else:
+                    temp_dict['unhealthy'] = temp_dict['unhealthy'] + random.sample(imgs_path_dict[folder], ratio)
+        
+            imgs_path_dict = temp_dict   
+            
+        else:
+            for folder, img_files  in imgs_path_dict.items():
+                if folder == 'healthy':
+                    temp_dict['healthy'] = imgs_path_dict[folder]
+                else:
+                    temp_dict['unhealthy'] = temp_dict['unhealthy'] + imgs_path_dict[folder]
+            
+            imgs_path_dict = temp_dict
+            
+        
+    return imgs_path_dict
     
     @classmethod
     def load_binary_classes(self, resize_shape, normalise, fetch_max_equal_ratio=True):

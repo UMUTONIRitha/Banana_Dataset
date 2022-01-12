@@ -4,14 +4,13 @@ import random
 
 class generate:
     def batch_1(img):
-        #img = np.asarray(img, np.float64)
+        """ Requires uint8 image dtype"""
         images_arrays = []
-        """Image arrays format is in list arrays"""
         images_arrays.insert(random.randint(0,len(images_arrays)), generate.rotation(img, -90))
         images_arrays.insert(random.randint(0,len(images_arrays)), generate.rotation(img, 90))
         images_arrays.insert(random.randint(0,len(images_arrays)), generate.vertical_flip(img))
-        #images_arrays.insert(random.randint(0,len(images_arrays)), generate.high_brightness(img))
-        #images_arrays.insert(random.randint(0,len(images_arrays)), generate.low_brightness(img))
+        images_arrays.insert(random.randint(0,len(images_arrays)), generate.high_brightness(img))
+        images_arrays.insert(random.randint(0,len(images_arrays)), generate.low_brightness(img))
         images_arrays.insert(random.randint(0,len(images_arrays)), generate.sharpen(img))
 
         return images_arrays
@@ -28,12 +27,10 @@ class generate:
         return cv2.flip(image,0)
     
     def high_brightness(image):
-        print(image.shape, np.ones(image.shape , dtype=np.uint8).shape)
-        return cv2.add(image, np.ones(image.shape , dtype=np.uint8) * .3)
+        return cv2.add(image, np.ones(image.shape , dtype=np.uint8) * 70)
 
     def low_brightness(image):
-        print(image.shape, np.ones(image.shape , dtype=np.uint8).shape)
-        return cv2.add(image, np.ones(image.shape , dtype=np.uint8) * -.3)
+        return cv2.substract(image, np.ones(image.shape , dtype=np.uint8) * -70)
 
     def sharpen(image):
         kernel = np.array([ [-1,-1,-1],
