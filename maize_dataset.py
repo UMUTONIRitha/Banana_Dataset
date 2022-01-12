@@ -105,7 +105,7 @@ class compile:
                 tree[split][class_folder]['original'] = int(len(imgs)/7) + 1
                 tree[split][class_folder]['generic'] = int(len(imgs)/7*6) - 1
 
-        for split_folder, split_file in tree('temp/').items():
+        for split_folder, split_file in tree.items():
             print(split_folder, 'folder')
             for class_folder, class_files in split_file.items():
                 print(f'    |--class {class_folder}')
