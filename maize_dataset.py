@@ -90,4 +90,21 @@ class compile:
         self.dataset_dir = fetch_imgs_path(self.path, class_encoding, equal_ratio_to_healthy, shuffle)
         #to split_folders
         to_split_folder(folder_path=self.temp_file, img_path_dict=self.dataset_dir, ratio=ratio, augment=augment)
+
+    def visualise_tree(path):
+        tree = {}
+        for split in os.listdir(path):
+            tree[split] = {}
+            for class_folder in os.listdir(path + split + '/'):
+                imgs = os.listdir(path + split + '/' + class_folder + '/')
+                tree[split][class_folder] = {}
+                tree[split][class_folder]['original'] = int(len(imgs)/7) + 1
+                tree[split][class_folder]['generic'] = int(len(imgs)/7*6) - 1
+
+        for split_folder, split_file in tree('temp/').items():
+            print(split_folder, 'folder')
+            for class_folder, class_files in split_file.items():
+                print(f'    |--class {class_folder}')
+                for ratio_id, ratio in  class_files.items():
+                    print(f'          |--contains {ratio} {ratio_id} images')
     
