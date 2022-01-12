@@ -91,7 +91,11 @@ class compile:
         #to split_folders
         to_split_folder(folder_path=self.temp_file, img_path_dict=self.dataset_dir, ratio=ratio, augment=augment)
 
-    def visualise_tree(path):
+        #visualise tree
+        self.visualise_tree()
+
+    @property
+    def visualise_tree(self, path=temp_file):
         tree = {}
         for split in os.listdir(path):
             tree[split] = {}
