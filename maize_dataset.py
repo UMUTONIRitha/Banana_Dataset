@@ -3,22 +3,10 @@ import cv2
 import random
 import os
 import numpy as np
+import shutil
 
-class compile:
-    path = r'Maize_Dataset/src/'
-    def __init__(self, classes='binary', resize_shape=(256, 256), normalise=True, load_equal_ratio=True, augmentation_stage=1):
-        self.fetch_imgs_paths()
-        if classes == 'binary':
-            self.data_x, self.data_y = self.load_binary_classes(resize_shape=resize_shape, normalise=normalise)
-        elif classes == 'all':
-            self.data_x, self.data_y = self.load_by_classes(resize_shape=resize_shape)
-        else :
-            return ValueError('Invalid class specification')
-        
-            
-       
-    @classmethod
-    def fetch_imgs_path(path, class_encoding, equal_ratio_to_healthy, shuffle):
+
+def fetch_imgs_path(path, class_encoding, equal_ratio_to_healthy, shuffle):
     class_folders = os.listdir(path)
     imgs_path_dict = {}
     for class_folder in class_folders:
@@ -49,75 +37,59 @@ class compile:
             
         
     return imgs_path_dict
-    
-    @classmethod
-    def load_binary_classes(self, resize_shape, normalise, fetch_max_equal_ratio=True):
-        x_dataset, y_dataset = [], []
-        healthy_class_len = len(self.imgs_paths['healthy'])
-        class_sample_size = int(healthy_class_len / 3)
-        if fetch_max_equal_ratio:
-            for class_folder in self.imgs_paths:
-                if class_folder == 'healthy':
-                    for img_path in self.imgs_paths[class_folder]:
-                        position = random.randint(0, len(x_dataset))
-                        img_array = cv2.resize(cv2.imread(self.path + class_folder + '/' + img_path), resize_shape, interpolation = cv2.INTER_AREA)
-                        x_dataset.insert(position, img_array / 256.0 if normalise == True else img_array)
-                        y_dataset.insert(position, 0)
-                        for img in generate.batch_1(img_array):
-                            new_pos = random.randint(0, len(x_dataset))
-                            x_dataset.insert(new_pos, img / 256.0 if normalise == True else img_array)
-                            y_dataset.insert(new_pos, 0)
-                            
-                        
-                else:
-                    sample_pool = random.sample(self.imgs_paths[class_folder], class_sample_size)
-                    for img in sample_pool:
-                        position = random.randint(0, len(x_dataset))
-                        img_array = cv2.resize(cv2.imread(self.path + class_folder + '/' + img), resize_shape, interpolation=cv2.INTER_AREA)
-                        x_dataset.insert(position, img_array / 256.0 if normalise == True else img_array)
-                        y_dataset.insert(position, 1)
-                        for img in generate.batch_1(img_array):
-                            new_pos = random.randint(0, len(x_dataset))
-                            x_dataset.insert(new_pos, img / 256.0 if normalise == True else img_array)
-                            y_dataset.insert(new_pos, 1)
-                        
-                        
-        elif fetch_max_equal_ratio == False:
-            for class_folder in self.imgs_paths:
-                if class_folder == 'healthy':
-                    for img_path in self.imgs_paths[class_folder]:
-                        position = random.randint(0, len(x_dataset))
-                        img_array = cv2.resize(cv2.imread(self.path + class_folder + '/' + img_path), resize_shape, interpolation = cv2.INTER_AREA)
-                        img_array = img_array / 256 if normalise == True else img_array
-                        x_dataset.insert(position, img_array)
-                        y_dataset.insert(position, 0)
-                else:
-                    for img_path in self.imgs_paths[class_folder]:
-                        position = random.randint(0, len(x_dataset))
-                        img_array = cv2.resize(cv2.imread(self.path + class_folder + '/' + img_path), resize_shape, interpolation = cv2.INTER_AREA)
-                        img_array = img_array / 256 if normalise == True else img_array
-                        x_dataset.insert(position, img_array)
-                        y_dataset.insert(position, 1)
-                                                  
-        return x_dataset, y_dataset
-    
-    @classmethod
-    def load_all_classes(self, resize_shape, fetch_max_equal_ratio=True, normalise=256):
+
+def save_generation(img_files, split, folder_path, class_folder, names, augment=1):
+    for img_file in img_files:
+        img = cv2.imread(img_file)
+        cv2.imwrite(folder_path + class_folder + '/' + str(names.pop()) + '.jpg', img)
+        if augment > 0:
+            if augment == 1:
+                img_array = generate.batch_1(img)
+                for generic_img in img_array:
+                    cv2.imwrite(folder_path + split + class_folder + '/' + str(names.pop()) + '.jpg', generic_img)
+        del img_file
+
+
+def to_split_folder(folder_path, img_path_dict, ratio, augment):
+    folder_splits = ('train/', 'val/', 'test/')
+    try:
+        shutil.rmtree(folder_path)
+    except FileNotFoundError:
         pass
-    @classmethod
-    def generator(self, data_x, data_y):
-        for index, img in enumerate(self.data_x):
-            for generic_img in generate.batch_1(img):
-                position = random.randint(0, len(self.data_x)) 
-                data_x.insert(position,generic_img)
-                data_y.insert(position, self.data_y[index]) 
-        return data_x, data_y
-    @property
-    def load(self, train_size=.7, test_size=.3):
-        if (train_size + test_size) == 1:
-            train_slice = int(len(self.x_dataset)/.7)
-            return self.x_dataset[:train_slice], self.y_dataset[:train_slice] , self.x_dataset[train_slice:], self.y_dataset[train_slice:]
-        elif (train_size + test_size) != 1:
-            return ValueError('Invalid Split Value') 
+    os.mkdir(folder_path)
         
+    for index, split in enumerate(ratio):
+        if sum(ratio) > 1:
+            print('Split Ratio is Invalid!')
+            break
+        os.mkdir(folder_path + folder_splits[index])
+        for folder in img_path_dict.keys():
+            os.mkdir(folder_path + folder_splits[ratio.index(split)] + folder)
+        if ratio.index(split) == 0:
+            for class_folder, img_files in img_path_dict.items():
+                img_files = img_files[:int(len(img_files)*split)]  
+                names = [id for id in range((len(img_files)) * 7)]
+                random.shuffle(names)
+                save_generation(img_files=img_files, split='train/', folder_path=folder_path, class_folder=class_folder, names=names)
+        if ratio.index(split) == 1:
+            for class_folder, img_files in img_path_dict.items():
+                img_files = img_files[int(len(img_files)*ratio[0]):(int(len(img_files)*ratio[0])+int(len(img_files)*split))]                
+                names = [id for id in range((len(img_files)) * 7)]
+                random.shuffle(names)
+                save_generation(img_files=img_files, split='val/', folder_path=folder_path, class_folder=class_folder, names=names)
+        if ratio.index(split) == 2:
+            for class_folder, img_files in img_path_dict.items():
+                img_files = img_files[(int(len(img_files)*ratio[0])+(int(len(img_files)*ratio[1])+int(len(img_files)*split))):]
+                names = [id for id in range((len(img_files)) * 7)]
+                random.shuffle(names)
+                save_generation(img_files=img_files, split='test/', folder_path=folder_path, class_folder=class_folder, names=names)
+
   
+class compile:
+    path = 'Maize_Dataset/src/'
+    temp_file = 'Maize_Dataset/temp/'
+    def __init__(self, class_encoding, ratio=[0.7,.2,.1], equal_ratio_to_healthy=False, shuffle=True, augment=1, random_file_name=True):
+        self.dataset_dir = fetch_imgs_path(self.path, class_encoding, equal_ratio_to_healthy, shuffle)
+        #to split_folders
+        to_split_folder(folder_path=self.temp_file, img_path_dict=self.dataset_dir, ratio=ratio, augment=augment)
+    
