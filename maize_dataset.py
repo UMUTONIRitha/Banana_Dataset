@@ -89,29 +89,21 @@ def to_split_folder(folder_path, img_path_dict, ratio, augment_train=1, augment_
                 names = [id for id in range((len(img_files)) * 7)]
                 random.shuffle(names)
                 tree['test'][class_folder] = save_generation(img_files=img_files, split='test/', folder_path=folder_path, class_folder=class_folder, names=names, augment=augment_test)
-  
+    return tree
+
 class compile:
     path = 'Maize_Dataset/src/'
     temp_file = 'Maize_Dataset/temp/'
     def __init__(self, class_encoding, ratio=[0.7,.2,.1], equal_ratio_to_healthy=False, shuffle=True, augment_train=1, augment_val=0, augment_test=0, random_file_name=True, ):
         self.dataset_dir = fetch_imgs_path(self.path, class_encoding, equal_ratio_to_healthy, shuffle)
         #to split_folders
-        to_split_folder(folder_path=self.temp_file, img_path_dict=self.dataset_dir, ratio=ratio, augment=augment_train, augment_val=augment_val, augment_test=augment_test)
+        tree = to_split_folder(folder_path=self.temp_file, img_path_dict=self.dataset_dir, ratio=ratio, augment=augment_train, augment_val=augment_val, augment_test=augment_test)
 
         #visualise tree
         self.visualise_tree()
 
     @property
-    def visualise_tree(self, path=temp_file):
-        tree = {}
-        for split in os.listdir(path):
-            tree[split] = {}
-            for class_folder in os.listdir(path + split + '/'):
-                imgs = os.listdir(path + split + '/' + class_folder + '/')
-                tree[split][class_folder] = {}
-                tree[split][class_folder]['original'] = int(len(imgs)/7) + 1
-                tree[split][class_folder]['generic'] = int(len(imgs)/7*6) - 1
-
+    def visualise_tree(self, tree):
         for split_folder, split_file in tree.items():
             print(split_folder, 'folder')
             for class_folder, class_files in split_file.items():
