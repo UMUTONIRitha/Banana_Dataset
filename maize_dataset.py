@@ -1,4 +1,4 @@
-from Maize_Dataset.generator import generate
+from .generator import generate
 import cv2
 import random
 import os
@@ -49,7 +49,7 @@ def save_generation(img_files, split, folder_path, class_folder, names, augment=
                     cv2.imwrite(folder_path + split + class_folder + '/' + str(names.pop()) + '.jpg', generic_img)
         del img_file
 
-def to_split_folder(folder_path, img_path_dict, ratio, augment):
+def to_split_folder(folder_path, img_path_dict, ratio, augment_train=1, augment_val=0, augment_test=0):
     folder_splits = ('train/', 'val/', 'test/')
     try:
         shutil.rmtree(folder_path)
@@ -69,27 +69,27 @@ def to_split_folder(folder_path, img_path_dict, ratio, augment):
                 img_files = img_files[:int(len(img_files)*split)]  
                 names = [id for id in range((len(img_files)) * 7)]
                 random.shuffle(names)
-                save_generation(img_files=img_files, split='train/', folder_path=folder_path, class_folder=class_folder, names=names)
+                save_generation(img_files=img_files, split='train/', folder_path=folder_path, class_folder=class_folder, names=names, augment=augment_train)
         if ratio.index(split) == 1:
             for class_folder, img_files in img_path_dict.items():
                 img_files = img_files[int(len(img_files)*ratio[0]):(int(len(img_files)*ratio[0])+int(len(img_files)*split))]                
                 names = [id for id in range((len(img_files)) * 7)]
                 random.shuffle(names)
-                save_generation(img_files=img_files, split='val/', folder_path=folder_path, class_folder=class_folder, names=names)
+                save_generation(img_files=img_files, split='val/', folder_path=folder_path, class_folder=class_folder, names=names, augment=augment_val)
         if ratio.index(split) == 2:
             for class_folder, img_files in img_path_dict.items():
                 img_files = img_files[(int(len(img_files)*ratio[0])+(int(len(img_files)*ratio[1]))):]
                 names = [id for id in range((len(img_files)) * 7)]
                 random.shuffle(names)
-                save_generation(img_files=img_files, split='test/', folder_path=folder_path, class_folder=class_folder, names=names)
+                save_generation(img_files=img_files, split='test/', folder_path=folder_path, class_folder=class_folder, names=names, augment=augment_test)
   
 class compile:
     path = 'Maize_Dataset/src/'
     temp_file = 'Maize_Dataset/temp/'
-    def __init__(self, class_encoding, ratio=[0.7,.2,.1], equal_ratio_to_healthy=False, shuffle=True, augment=1, random_file_name=True):
+    def __init__(self, class_encoding, ratio=[0.7,.2,.1], equal_ratio_to_healthy=False, shuffle=True, augment_train=1, augment_val=0, augment_test=0, random_file_name=True, ):
         self.dataset_dir = fetch_imgs_path(self.path, class_encoding, equal_ratio_to_healthy, shuffle)
         #to split_folders
-        to_split_folder(folder_path=self.temp_file, img_path_dict=self.dataset_dir, ratio=ratio, augment=augment)
+        to_split_folder(folder_path=self.temp_file, img_path_dict=self.dataset_dir, ratio=ratio, augment=augment_train, augment_val=augment_val, augment_test=augment_test)
 
         #visualise tree
         self.visualise_tree()
