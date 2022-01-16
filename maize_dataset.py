@@ -100,7 +100,7 @@ class compile:
         tree = to_split_folder(folder_path=self.temp_file, img_path_dict=self.dataset_dir, ratio=ratio, augment_train=augment_train, augment_val=augment_val, augment_test=augment_test)
 
         #visualise tree
-        self.visualise_tree()
+        self.visualise_tree(tree)
 
     @property
     def visualise_tree(self, tree):
