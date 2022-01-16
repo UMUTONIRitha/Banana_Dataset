@@ -51,7 +51,7 @@ def save_generation(img_files, split, folder_path, class_folder, names, augment=
                 for generic_img in img_array:
                     cv2.imwrite(folder_path + split + class_folder + '/' + str(names.pop()) + '.jpg', generic_img)
                     gen_count += 1
-        del img_file, img_array
+        del img_file
 
     return {'Original':count, 'Generic':gen_count}
 
