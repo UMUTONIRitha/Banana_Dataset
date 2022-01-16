@@ -39,17 +39,24 @@ def fetch_imgs_path(path, class_encoding, equal_ratio_to_healthy, shuffle):
     return imgs_path_dict
 
 def save_generation(img_files, split, folder_path, class_folder, names, augment=1):
+    count = 0
+    gen_count = 0
     for img_file in img_files:
         img = cv2.imread(img_file)
         cv2.imwrite(folder_path + class_folder + '/' + str(names.pop()) + '.jpg', img)
+        count += 1
         if augment > 0:
             if augment == 1:
                 img_array = generate.batch_1(img)
                 for generic_img in img_array:
                     cv2.imwrite(folder_path + split + class_folder + '/' + str(names.pop()) + '.jpg', generic_img)
+                    gen_count += 1
         del img_file
 
+    return {'Original':count, 'Generic':gen_count}
+
 def to_split_folder(folder_path, img_path_dict, ratio, augment_train=1, augment_val=0, augment_test=0):
+    tree = {'train':{}, 'val':{}, 'test':{}}
     folder_splits = ('train/', 'val/', 'test/')
     try:
         shutil.rmtree(folder_path)
@@ -69,19 +76,19 @@ def to_split_folder(folder_path, img_path_dict, ratio, augment_train=1, augment_
                 img_files = img_files[:int(len(img_files)*split)]  
                 names = [id for id in range((len(img_files)) * 7)]
                 random.shuffle(names)
-                save_generation(img_files=img_files, split='train/', folder_path=folder_path, class_folder=class_folder, names=names, augment=augment_train)
+                tree['train'][class_folder] = save_generation(img_files=img_files, split='train/', folder_path=folder_path, class_folder=class_folder, names=names, augment=augment_train)
         if ratio.index(split) == 1:
             for class_folder, img_files in img_path_dict.items():
                 img_files = img_files[int(len(img_files)*ratio[0]):(int(len(img_files)*ratio[0])+int(len(img_files)*split))]                
                 names = [id for id in range((len(img_files)) * 7)]
                 random.shuffle(names)
-                save_generation(img_files=img_files, split='val/', folder_path=folder_path, class_folder=class_folder, names=names, augment=augment_val)
+                tree['val'][class_folder] = save_generation(img_files=img_files, split='val/', folder_path=folder_path, class_folder=class_folder, names=names, augment=augment_val)
         if ratio.index(split) == 2:
             for class_folder, img_files in img_path_dict.items():
                 img_files = img_files[(int(len(img_files)*ratio[0])+(int(len(img_files)*ratio[1]))):]
                 names = [id for id in range((len(img_files)) * 7)]
                 random.shuffle(names)
-                save_generation(img_files=img_files, split='test/', folder_path=folder_path, class_folder=class_folder, names=names, augment=augment_test)
+                tree['test'][class_folder] = save_generation(img_files=img_files, split='test/', folder_path=folder_path, class_folder=class_folder, names=names, augment=augment_test)
   
 class compile:
     path = 'Maize_Dataset/src/'
