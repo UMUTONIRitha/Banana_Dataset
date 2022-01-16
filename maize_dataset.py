@@ -43,7 +43,7 @@ def save_generation(img_files, split, folder_path, class_folder, names, augment=
     gen_count = 0
     for img_file in img_files:
         img = cv2.imread(img_file)
-        cv2.imwrite(folder_path + class_folder + '/' + str(names.pop()) + '.jpg', img)
+        cv2.imwrite(folder_path + split + class_folder + '/' + str(names.pop()) + '.jpg', img)
         count += 1
         if augment > 0:
             if augment == 1:
@@ -51,7 +51,7 @@ def save_generation(img_files, split, folder_path, class_folder, names, augment=
                 for generic_img in img_array:
                     cv2.imwrite(folder_path + split + class_folder + '/' + str(names.pop()) + '.jpg', generic_img)
                     gen_count += 1
-        del img_file
+        del img_file, img_array
 
     return {'Original':count, 'Generic':gen_count}
 
