@@ -97,14 +97,11 @@ class compile:
     def __init__(self, class_encoding, ratio=[0.7,.2,.1], equal_ratio_to_healthy=False, shuffle=True, augment_train=1, augment_val=0, augment_test=0, random_file_name=True, ):
         self.dataset_dir = fetch_imgs_path(self.path, class_encoding, equal_ratio_to_healthy, shuffle)
         #to split_folders
-        tree = to_split_folder(folder_path=self.temp_file, img_path_dict=self.dataset_dir, ratio=ratio, augment_train=augment_train, augment_val=augment_val, augment_test=augment_test)
-
-        #visualise tree
-        self.visualise_tree(tree)
+        self.tree = to_split_folder(folder_path=self.temp_file, img_path_dict=self.dataset_dir, ratio=ratio, augment_train=augment_train, augment_val=augment_val, augment_test=augment_test)
 
     @property
-    def visualise_tree(self, tree):
-        for split_folder, split_file in tree.items():
+    def visualise_tree(self):
+        for split_folder, split_file in self.tree.items():
             print(split_folder, 'folder')
             for class_folder, class_files in split_file.items():
                 print(f'    |--class {class_folder}')
